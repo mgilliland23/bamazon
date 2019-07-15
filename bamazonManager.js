@@ -4,7 +4,7 @@ var Table = require('cli-table');
 
 
 var table = new Table({
-    head: ['ID', 'Product Name', 'Price', 'Quantity']
+    head: ['ID', 'Product Name', 'Price', 'Quantity', 'Product Sales']
 
 });
 
@@ -108,7 +108,7 @@ function viewProducts() {
         if (err) throw err;
 
         res.forEach(function (row) {
-            table.push([row.item_id, row.product_name, row.price, row.stock_quantity]);
+            table.push([row.item_id, row.product_name, row.price, row.stock_quantity, row.product_sales]);
         })
 
         console.log(table.toString());

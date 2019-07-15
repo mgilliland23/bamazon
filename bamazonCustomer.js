@@ -31,11 +31,12 @@ connection.connect(function (err) {
 
 var products = [];
 
-function Product(id, name, price, quantity) {
+function Product(id, name, price, quantity, product_sales) {
     this.id = id;
     this.name = name;
     this.price = price;
     this.quantity = quantity;
+    this.product_sales = product_sales;
 }
 
 function afterConnection() {
@@ -44,7 +45,7 @@ function afterConnection() {
 
         res.forEach(function (row) {
             //Since already returning all products from DB, create a global array of these products to reduce number of calls to the DB
-            var product = new Product(row.item_id, row.product_name, row.price, row.stock_quantity);
+            var product = new Product(row.item_id, row.product_name, row.price, row.stock_quantity, row.product_sales);
             products.push(product);
             table.push([row.item_id, row.product_name, row.price]);
 
@@ -99,16 +100,28 @@ function inStock(itemID, quantity) {
 
 //Updates the product quantity in the DB and alerts the customer the cost of his/her order
 function orderProduct(itemID, quantity, total) {
-    connection.query('UPDATE products SET ? WHERE ?', [
-        { stock_quantity: quantity },
-        { item_id: itemID }
-    ],
+    connection.query('UPDATE products SET ? WHERE ?',
+        [
+            { stock_quantity: quantity },
+            { item_id: itemID }
+        ],
         function (err, res) {
             if (err) throw err;
 
             console.log("You're order has been placed!")
             console.log("The grand total is: $" + total);
-            connection.end();
-        });
 
+        });
+    products[itemID - 1].product_sales += total;
+    var total_sales = products[itemID - 1].product_sales;
+
+    connection.query('UPDATE products SET ? WHERE ?',
+        [
+            { product_sales: total_sales },
+            { item_id: itemID }
+        ],
+        function (err, res) {
+            if (err) throw err;
+        });
+    connection.end();
 }
