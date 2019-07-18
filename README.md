@@ -20,7 +20,7 @@ Running 'node bamazonManager' presents the user with the manager view which give
 
 
 
-#####View Products for Sale
+##### View Products for Sale
 
 ![gif](view_products.gif)
 
